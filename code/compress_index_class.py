@@ -5,6 +5,8 @@ class WAH:  # WAH compression class
     def __init__(self, data, word_size):
         self.data = data
         self.size = word_size - 1
+        self.run = 0
+        self.literal = 0
 
     @staticmethod
     def __list_to_string(my_list):  # turn a list to a string
@@ -69,6 +71,7 @@ class WAH:  # WAH compression class
                     break
 
                 if self.__is_run(each_section):  # a run of either 1 or 0
+                    self.run += 1
                     if len(compressed) == 0:  # first run
                         compressed += self.__add_run(each_section)
                         previous_was_run = True
@@ -92,10 +95,14 @@ class WAH:  # WAH compression class
                             previous_was_run = True
 
                 else:  # literal
+                    self.literal += 1
                     compressed += self.__add_literal(each_section)
                     previous_was_run = False
 
             yield self.__list_to_string(compressed)
+
+        # number of run and literal for the entire file
+        print("# run = " + str(self.run) + ", # literal = " + str(self. literal))
 
 
 def compress_index(bitmap_index, output_path, compression_method, word_size):

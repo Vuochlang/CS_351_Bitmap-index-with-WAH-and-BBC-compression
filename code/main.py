@@ -1,9 +1,12 @@
 import create_index as create
 import compress_index as compress
+from pathlib import Path
 
 if __name__ == "__main__":
-    file_name = "animals_small.txt"
-    create.create_index(file_name, "my_output/bitmaps/", False)
+    file_name = "animals.txt"
+    output_path = Path("my_output/bitmaps/")
+    create.create_index(file_name, output_path, False)
 
-    bitmap_index = "animals_small2.txt"
-    compress.compress_index(bitmap_index, "my_output/compressed", "WAH", 64)
+    bitmap_index = "test_big_animals.txt_sorted"
+    output_path = Path("my_output/compressed")
+    compress.compress_index(bitmap_index, output_path, "WAH", 8)
