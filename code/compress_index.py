@@ -7,7 +7,7 @@ def list_to_string(my_list):  # turn a list to a string
     return string
 
 
-class WAH:  # WAH compression class
+class WAH:  # Word Aligned Hybrid compression class
     def __init__(self, data, word_size):
         self.data = data
         self.size = word_size - 1
@@ -106,7 +106,7 @@ class WAH:  # WAH compression class
         # print("# run = " + str(self.run) + ", # literal = " + str(self. literal))
 
 
-class BBC:
+class BBC:  # Byte-aligned Bitmap Compression Class
     def __init__(self):
         self.number_of_run = 0
         self.number_of_literal = 0
@@ -142,7 +142,7 @@ class BBC:
                 if dirty_bit == 1:
                     return False
                 dirty_bit += 1
-                location = i + 1
+                location = i + 1  ###################################################
         return location
 
     def compress(self, data):
@@ -184,6 +184,8 @@ class BBC:
 
                     # literal of the chunk
                     if not found_chunk:
+                        if self.number_of_literal == 7
+
                         self.number_of_literal += 1
                         self.literal_list += [each_byte]
                         chunks = chunks[1:]
