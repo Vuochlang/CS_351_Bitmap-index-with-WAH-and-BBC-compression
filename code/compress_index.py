@@ -125,7 +125,7 @@ class BBC:  # Byte-aligned Bitmap Compression Class
         return True
 
     @staticmethod
-    def decimal_to_binary(number):
+    def decimal_to_binary(number):  # convert decimal to binary
         bin_list = []
         while number > 0:
             bin_list += [str(number % 2)]
@@ -145,26 +145,28 @@ class BBC:  # Byte-aligned Bitmap Compression Class
                 location = i + 1  ###################################################
         return location
 
-    def compress(self, data):
+    def compress(self, data):  # WAH compression on data's columns
         for column in range(16):
             string = ""
 
+            # combine each column per row into a string
             for each_line in data:
                 string += each_line[column]
 
-            # run through each column
-            # divide into list with length of 8 bits for BBC and compress them
+            # divide the string into list with length of 8 bits for BBC to compress them
             chunks = [string[i:(i + 8)] for i in range(0, len(string), 8)]
 
             found_chunk = False
             last_piece = False
-            compressed = []
+            compressed = []  # store the result of BBC compression
             self.reset()
 
+            # loop through 8 bit at a time to decide what to do
+            # set number of literal, run and list of literal as needed
             while len(chunks) > 0:
-                each_byte = chunks[0]
+                each_byte = chunks[0]  # first item in the list
 
-                # check if run or literal
+                # check if that 8bit is run or literal
                 run = self.__is_run(each_byte)
 
                 if run:
@@ -184,39 +186,39 @@ class BBC:  # Byte-aligned Bitmap Compression Class
 
                     # literal of the chunk
                     if not found_chunk:
-                        if self.number_of_literal == 7
-
                         self.number_of_literal += 1
                         self.literal_list += [each_byte]
                         chunks = chunks[1:]
                         if len(chunks) == 0:
                             last_piece = True
 
+                # when a chunk is found, call compress_chunk() to compress and store result
                 if found_chunk:
                     compressed += self.compress_chunk()
                     found_chunk = False
                     self.reset()
 
+                # compress the left over byte
                 if last_piece:
                     compressed += self.compress_chunk()
                     break
 
             yield list_to_string(compressed)
 
-    def compress_chunk(self):
+    def compress_chunk(self):  # compress one chunk and return result as a list
         this_list = []
         run_byte = False
         special_literal = False
 
         # Header bit 1 - 3
-        if self.number_of_run > 0:  # run byte exist before literal
+        if self.number_of_run > 0:
             if self.number_of_run <= 6:
                 this_list += self.add_zero_with_binary(self.number_of_run, 3)
             else:  # run > 6
                 run_byte = True
                 this_list += ["1"] * 3
 
-        else:  # no run in the chunk
+        else:  # no run of 0's in the chunk
             this_list += ["0"] * 3
 
         # Header bit 4, special literal or not
@@ -231,23 +233,25 @@ class BBC:  # Byte-aligned Bitmap Compression Class
                 this_list += ["1"]
 
         # Header bit 5 - 8
-        if this_list[-1] == "1":
+        if this_list[-1] == "1":  # if bit 4 is special, store the position of the dirty bit
             this_list += self.add_zero_with_binary(special_literal, 4)
 
-        elif this_list[-1] == "0":
+        elif this_list[-1] == "0":  # if bit 4 is not special, store number of literals
             this_list += self.add_zero_with_binary(self.number_of_literal, 4)
 
         # Run byte
-        if run_byte:
+        if run_byte:  # if number of run is greater than 6, convert into binary and store in as a byte
             this_list += self.add_zero_with_binary(self.number_of_run, 8)
 
         # Literal byte
-        if not special_literal:
+        if not special_literal:  # when bit 4 is "0", store those literal bytes
             for each_literal in self.literal_list:
                 this_list += each_literal
 
         return this_list
 
+    # take in a decimal, convert into binary
+    # if the binary bit is less than size, append 0's in front of it
     def add_zero_with_binary(self, decimal, size):
         temp = self.decimal_to_binary(decimal)
         if len(temp) == size:
