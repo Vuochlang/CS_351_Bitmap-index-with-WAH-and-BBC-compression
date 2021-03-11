@@ -102,7 +102,7 @@ class WAH:  # WAH compression class
             yield self.__list_to_string(compressed)
 
         # number of run and literal for the entire file
-        print("# run = " + str(self.run) + ", # literal = " + str(self. literal))
+        # print("# run = " + str(self.run) + ", # literal = " + str(self. literal))
 
 
 def compress_index(bitmap_index, output_path, compression_method, word_size):
