@@ -14,7 +14,7 @@ Once create the bitmap, it needs to be compressed using WAH or BBC."</p>
 <h4> create_index(input_file, output_path, sorted) </h4>
 <h4> compress_index(bitmap_index, output_path, compression_method, word_size) </h4>
 
-    <h5> Requirements: </h5>
+<h5> Requirements: </h5>
    
     _ Do not use any libraries for bitmap creation or compression 
     
