@@ -142,7 +142,8 @@ class BBC:  # Byte-aligned Bitmap Compression Class
                 if dirty_bit == 1:
                     return False
                 dirty_bit += 1
-                location = i + 1  ###################################################
+                # location = i + 1
+                location = i  # start count at 0
         return location
 
     def compress(self, data):  # WAH compression on data's columns
@@ -170,27 +171,31 @@ class BBC:  # Byte-aligned Bitmap Compression Class
                 run = self.__is_run(each_byte)
 
                 if run:
+                    if not found_chunk:
 
-                    # first run in a chunk
-                    if not found_chunk and self.number_of_literal == 0:
-                        self.number_of_run += 1
-                        chunks = chunks[1:]
-                        if len(chunks) == 0:
-                            last_piece = True
+                        # previous bit string was literal, then end of the current chunk
+                        if self.number_of_literal > 0:
+                            found_chunk = True
 
-                    # end of current chunk
-                    elif not found_chunk and self.number_of_literal > 0:
-                        found_chunk = True
+                        # first run in a chunk
+                        elif self.number_of_literal == 0:
+                            self.number_of_run += 1
+                            chunks = chunks[1:]
+                            if len(chunks) == 0:
+                                last_piece = True
 
                 else:  # literal
 
                     # literal of the chunk
                     if not found_chunk:
-                        self.number_of_literal += 1
-                        self.literal_list += [each_byte]
-                        chunks = chunks[1:]
-                        if len(chunks) == 0:
-                            last_piece = True
+                        if self.number_of_literal == 15:  # max number of literal per Header Byte
+                            found_chunk = True
+                        else:
+                            self.number_of_literal += 1
+                            self.literal_list += [each_byte]
+                            chunks = chunks[1:]
+                            if len(chunks) == 0:
+                                last_piece = True
 
                 # when a chunk is found, call compress_chunk() to compress and store result
                 if found_chunk:

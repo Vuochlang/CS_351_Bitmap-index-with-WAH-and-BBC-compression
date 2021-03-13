@@ -60,13 +60,12 @@ def create_index(input_file, output_path, sorted):
         # store all lines from teh input file in the 'data'
         data = fd_input.readlines()
 
-        # if the file is not sorted, create index of that file first
-        if not sorted:
-            output_file = os.path.join(output_path, input_file)
-            convert_and_write_to_file(data, output_file)
+        # if sorted is True, sort the data and create_index later
+        if sorted:
+            output_file = os.path.join(output_path, input_file + "_sorted")
             data.sort()  # sort the data
+        else:
+            output_file = os.path.join(output_path, input_file)
 
-        # file is sorted, create index from the file
-        output_file = os.path.join(output_path, input_file + "_sorted")
         convert_and_write_to_file(data, output_file)
         fd_input.close()
