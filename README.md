@@ -16,4 +16,5 @@ Once create the bitmap, it needs to be compressed using WAH or BBC."</p>
 
 <h5> Requirements: </h5>
     _ Do not use any libraries for bitmap creation or compression 
+    
     _ Design of WAH should be independent of word size, example, 8, 16, 32, 62, etc.
