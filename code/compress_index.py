@@ -11,11 +11,12 @@ class WAH:  # Word Aligned Hybrid compression class
     def __init__(self, data, word_size):
         self.data = data
         self.size = word_size - 1
-        self.run = 0
-        self.literal = 0
+        self.run_counter = 0
+        self.literal_counter = 0
 
     @staticmethod
     def __add_binary(list1, list2):  # get two lists and add their value as binary, return the sum as a list
+        # print(str(list1), " + ", str(list2), end="")
         length = len(list1)
         bin1_str = list_to_string(list1)
         bin2_str = list_to_string(list2)
@@ -26,8 +27,9 @@ class WAH:  # Word Aligned Hybrid compression class
         if len(total) < length:
             dif = length - len(total)
             new_total = ["0"] * dif + total
+            # print("==> ", str(new_total))
             return new_total
-
+        # print("==> ", str(total))
         return total
 
     @staticmethod
@@ -50,6 +52,13 @@ class WAH:  # Word Aligned Hybrid compression class
         compress += [i for i in section]  # append the whole bit string
         return compress
 
+    @staticmethod
+    def __is_run_full(section):
+        for i in section:
+            if i == '0':
+                return False
+        return True
+
     def compress(self):
         for column in range(16):
             string = ""
@@ -60,6 +69,10 @@ class WAH:  # Word Aligned Hybrid compression class
             # run through each column
             # divide into list with length of 'size' and compress them
             chunks = [string[i:(i + self.size)] for i in range(0, len(string), self.size)]
+            # chunks = chunks[:3578]
+            # print(chunks[3577], " ", chunks[3578], " ", len(chunks))
+            # for each in chunks:
+            #     print(each)
 
             compressed = []
             previous_was_run = False
@@ -72,7 +85,7 @@ class WAH:  # Word Aligned Hybrid compression class
                     break
 
                 if self.__is_run(each_section):  # a run of either 1 or 0
-                    self.run += 1
+                    self.run_counter += 1
                     if len(compressed) == 0:  # first run
                         compressed += self.__add_run(each_section)
                         previous_was_run = True
@@ -80,13 +93,18 @@ class WAH:  # Word Aligned Hybrid compression class
                         if previous_was_run:
                             if compressed[-self.size] == each_section[0]:  # same run as previous
                                 previous = compressed[-(self.size - 1):]
-                                new_value = ["0"] * (self.size - 2) + ["1"]
 
-                                # slice out bits to store number of run
-                                compressed = compressed[:(len(compressed) - self.size + 1)]
+                                # if a bit string store up to the max number of run
+                                if self.__is_run_full(previous):
+                                    compressed += self.__add_run(each_section)
+                                else:
+                                    new_value = ["0"] * (self.size - 2) + ["1"]
 
-                                # append new sum binary value
-                                compressed += self.__add_binary(previous, new_value)
+                                    # slice out bits to store number of run
+                                    compressed = compressed[:(len(compressed) - self.size + 1)]
+
+                                    # append new sum binary value
+                                    compressed += self.__add_binary(previous, new_value)
 
                             else:  # new run, differ from previous run
                                 compressed += self.__add_run(each_section)
@@ -96,14 +114,14 @@ class WAH:  # Word Aligned Hybrid compression class
                             previous_was_run = True
 
                 else:  # literal
-                    self.literal += 1
+                    self.literal_counter += 1
                     compressed += self.__add_literal(each_section)
                     previous_was_run = False
 
             yield list_to_string(compressed)
 
         # number of run and literal for the entire file
-        # print("# run = " + str(self.run) + ", # literal = " + str(self. literal))
+        print("# run = " + str(self.run_counter) + ", # literal = " + str(self. literal_counter))
 
 
 class BBC:  # Byte-aligned Bitmap Compression Class
