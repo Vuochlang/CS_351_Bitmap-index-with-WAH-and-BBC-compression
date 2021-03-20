@@ -16,7 +16,6 @@ class WAH:  # Word Aligned Hybrid compression class
 
     @staticmethod
     def __add_binary(list1, list2):  # get two lists and add their value as binary, return the sum as a list
-        # print(str(list1), " + ", str(list2), end="")
         length = len(list1)
         bin1_str = list_to_string(list1)
         bin2_str = list_to_string(list2)
@@ -27,9 +26,8 @@ class WAH:  # Word Aligned Hybrid compression class
         if len(total) < length:
             dif = length - len(total)
             new_total = ["0"] * dif + total
-            # print("==> ", str(new_total))
             return new_total
-        # print("==> ", str(total))
+
         return total
 
     @staticmethod
@@ -69,10 +67,6 @@ class WAH:  # Word Aligned Hybrid compression class
             # run through each column
             # divide into list with length of 'size' and compress them
             chunks = [string[i:(i + self.size)] for i in range(0, len(string), self.size)]
-            # chunks = chunks[:3578]
-            # print(chunks[3577], " ", chunks[3578], " ", len(chunks))
-            # for each in chunks:
-            #     print(each)
 
             compressed = []
             previous_was_run = False
@@ -121,7 +115,7 @@ class WAH:  # Word Aligned Hybrid compression class
             yield list_to_string(compressed)
 
         # number of run and literal for the entire file
-        print("# run = " + str(self.run_counter) + ", # literal = " + str(self. literal_counter))
+        # print("# run = " + str(self.run_counter) + ", # literal = " + str(self. literal_counter))
 
 
 class BBC:  # Byte-aligned Bitmap Compression Class
